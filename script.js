@@ -252,7 +252,23 @@ function updateUI() {
 
     let dailyTotal = 0;
 
-    let data = musicas.map(m => {
+    // --- CÁLCULO DOS ÁLBUNS ---
+    let sumRare = 0;
+    let sumRevival = 0;
+    let sumWTSGD = 0;
+
+    musicas.forEach(m => {
+        const nome = m[0];
+        const daily = toNum(m[2]);
+        if (["Lose You To Love Me", "Look At Her Now", "Rare", "Boyfriend", "Souvenir", "Ring", "Vulnerable", "Dance Again", "Crowded Room (feat. 6LACK)", "Let Me Get Me", "Cut You Off", "Kinda Crazy", "Fun", "A Sweeter Place (feat. Kid Cudi)", "She", "People You Know"].includes(nome)) sumRare += daily;
+        if (["Good For You", "Hands To Myself", "Same Old Love", "Kill Em With Kindness", "Me & The Rhythm", "Sober", "Me & My Girls", "Perfect", "Revival", "Nobody", "Camouflage", "Rise", "Cologne", "Outta My Hands (Loco)"].includes(nome)) sumRevival += daily;
+        if (["Love You Like A Love Song", "Who Says", "Hit The Lights", "When The Sun Goes Down", "My Dilemma", "Bang Bang Bang", "Dices", "Middle Of Nowhere", "Whiplash", "That's More Like It", "Outlaw"].includes(nome)) sumWTSGD += daily;
+    });
+
+    if(document.getElementById("countRare")) document.getElementById("countRare").innerText = "+" + sumRare.toLocaleString();
+    if(document.getElementById("countRevival")) document.getElementById("countRevival").innerText = "+" + sumRevival.toLocaleString();
+    if(document.getElementById("countWTSGD")) document.getElementById("countWTSGD").innerText = "+" + sumWTSGD.toLocaleString();
+    // -------------------------
         const total = toNum(m[1]);
         const daily = toNum(m[2]);
         const dailyOntem = toNum(m[3]);
