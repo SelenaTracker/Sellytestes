@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Selena Gomez • Metas Spotify 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -25,95 +25,35 @@
         <h1>Selena Gomez • Metas Spotify 2026</h1>
         <p>Atualizado manualmente 04/01/2026</p>
     </header>
-  
-<div class="focus-card">
-    <div class="focus-info">
-        <span class="focus-badge">🔥 Foco do Dia</span>
-        <span class="focus-song">Survivors</span>
-        <p class="focus-text">A meta coletiva de hoje é impulsionar esta faixa!</p>
+
+    <div class="focus-card">
+        <div class="focus-info">
+            <span class="focus-badge">🔥 Foco do Dia</span>
+            <span class="focus-song">Survivors - A meta coletiva de hoje é impulsionar esta faixa </span>
+            <p class="focus-text">Ouça na sua playlist favorita!</p>
+        </div>
+        <button onclick="window.location.href='#calculadora'" class="btn-calc" style="width: auto; padding: 12px 30px;">SIMULAR META</button>
     </div>
-    <button onclick="window.location.href='#calculadora'" class="btn-calc" style="width: auto; padding: 12px 30px;">SIMULAR META</button>
-</div>
 
-<div class="summary-cards">
-    <div class="stat-card">
-        <h4>🚀 Próximas Metas</h4>
-        <div id="nextMilestone">Calculando...</div>
-    </div>
-    <div class="stat-card">
-        <h4>📈 Total Diário</h4>
-        <p id="totalDailyStats">6.977.640</p>
-    </div>
-</div>
-
-<div class="album-dashboard">
-    <h3 style="color: var(--ocean); margin: 25px 5px 15px; font-size: 1.1rem;">🏆 Top Álbuns (Estatísticas)</h3>
-    <div class="album-grid">
-        <div class="album-card">
-            <div class="rank-num">1</div>
-            <div class="a-info">
-                <p class="a-name">Revival</p>
-                <p class="a-total">3.648.721.313</p>
-                <p class="a-daily">+651.178</p>
-            </div>
+    <div class="summary-cards">
+        <div class="stat-card">
+            <h4>🚀 Próximas Metas</h4>
+            <div id="nextMilestone">Calculando...</div>
         </div>
-
-        <div class="album-card">
-            <div class="rank-num">2</div>
-            <div class="a-info">
-                <p class="a-name">Rare (Deluxe)</p>
-                <p class="a-total">3.482.995.379</p>
-                <p class="a-daily">+653.234</p>
-            </div>
-        </div>
-
-        <div class="album-card">
-            <div class="rank-num">3</div>
-            <div class="a-info">
-                <p class="a-name">When The Sun Goes Down</p>
-                <p class="a-total">1.973.000.000</p>
-                <p class="a-daily">+835.483</p>
-            </div>
-        </div>
-
-        <div class="album-card">
-            <div class="rank-num">4</div>
-            <div class="a-info">
-                <p class="a-name">I Said I Love You First...</p>
-                <p class="a-total">1.109.742.300</p>
-                <p class="a-daily">+691.157</p>
-            </div>
-        </div>
-
-        <div class="album-card">
-            <div class="rank-num">5</div>
-            <div class="a-info">
-                <p class="a-name">A Year Without Rain</p>
-                <p class="a-total">985.000.000</p>
-                <p class="a-daily">+118.892</p>
-            </div>
-        </div>
-
-        <div class="album-card">
-            <div class="rank-num">6</div>
-            <div class="a-info">
-                <p class="a-name">Kiss & Tell</p>
-                <p class="a-total">740.000.000</p>
-                <p class="a-daily">+21.145</p>
-            </div>
+        <div class="stat-card">
+            <h4>📈 Total Diário (Resultados)</h4>
+            <p id="totalDailyStats">0</p>
         </div>
     </div>
-</div>
-  
 
     <div class="filter-container">
         <button class="filter-btn" id="btnSolo" onclick="toggleFilter('Solo')">
             <h5>Selena Gomez</h5>
-            <span class="filter-total" id="totalSolo">25.638.037.556 STREAMS</span>
+            <span class="filter-total" id="totalSolo">25.644.039.676 STREAMS</span>
         </button>
         <button class="filter-btn" id="btnScene" onclick="toggleFilter('Scene')">
             <h5>Selena Gomez & The Scene</h5>
-            <span class="filter-total" id="totalScene">2.616.831.873 STREAMS</span>
+            <span class="filter-total" id="totalScene">2.617.807.393 STREAMS</span>
         </button>
     </div>
 
@@ -205,6 +145,6 @@
     </footer>
 </div>
 
-
+<script src="script.js"></script>
 </body>
 </html>
