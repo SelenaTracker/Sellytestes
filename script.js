@@ -205,155 +205,94 @@ let currentFilter = 'All';
 
 function toNum(val) {
     if (!val) return 0;
-    if (typeof val === 'number') return val;
     return Number(val.toString().replace(/\./g, '').trim()) || 0;
 }
 
 function getTarget(total, daily) {
-    let step;
-    if (daily < 5000) step = 500000;
-    else if (daily < 19000) step = 1000000;
-    else if (daily < 50000) step = 2000000;
-    else step = 5000000;
+    let step = daily < 5000 ? 500000 : (daily < 50000 ? 2000000 : 5000000);
     return Math.ceil((total + 1) / step) * step;
 }
 
 function getLabel(t) {
-    if (t >= 1000000000) return (t / 1000000000).toFixed(2).replace('.00', '') + "B";
-    return (t / 1000000).toFixed(1).replace('.0', '') + "M";
+    if (t >= 1000000000) return (t / 1000000000).toFixed(2) + "B";
+    return (t / 1000000).toFixed(1) + "M";
+}
+
+function toggleFilter(cat) {
+    currentFilter = currentFilter === cat ? 'All' : cat;
+    const btnSolo = document.getElementById("btnSolo");
+    const btnScene = document.getElementById("btnScene");
+    if(btnSolo) btnSolo.classList.toggle("active", currentFilter === 'Solo');
+    if(btnScene) btnScene.classList.toggle("active", currentFilter === 'Scene');
+    updateUI();
 }
 
 function setSort(m) { sortMode = m; updateUI(); }
 
-function toggleFilter(cat) {
-    if (currentFilter === cat) {
-        currentFilter = 'All';
-    } else {
-        currentFilter = cat;
-    }
-
-    const cardSolo = document.getElementById("cardSolo");
-    const cardScene = document.getElementById("cardScene");
-
-    if(cardSolo && cardScene) {
-        cardSolo.style.opacity = (currentFilter === 'Solo' || currentFilter === 'All') ? "1" : "0.5";
-        cardScene.style.opacity = (currentFilter === 'Scene' || currentFilter === 'All') ? "1" : "0.5";
-        cardSolo.style.transform = (currentFilter === 'Solo') ? "scale(1.05)" : "scale(1)";
-        cardScene.style.transform = (currentFilter === 'Scene') ? "scale(1.05)" : "scale(1)";
-    }
-    updateUI();
-}
-
 function updateUI() {
-    const searchInput = document.getElementById("searchInput");
-    const search = searchInput ? searchInput.value.toLowerCase() : "";
+    const search = document.getElementById("searchInput") ? document.getElementById("searchInput").value.toLowerCase() : "";
     const body = document.getElementById("tableBody");
-    if(!body) return;
+    if (!body) return;
 
     let dailyTotal = 0;
 
-    // --- CÁLCULO DOS ÁLBUNS ---
-    let sumRare = 0;
-    let sumRevival = 0;
-    let sumWTSGD = 0;
-
-    musicas.forEach(m => {
-        const nome = m[0];
-        const daily = toNum(m[2]);
-        if (["Lose You To Love Me", "Look At Her Now", "Rare", "Boyfriend", "Souvenir", "Ring", "Vulnerable", "Dance Again", "Crowded Room (feat. 6LACK)", "Let Me Get Me", "Cut You Off", "Kinda Crazy", "Fun", "A Sweeter Place (feat. Kid Cudi)", "She", "People You Know"].includes(nome)) sumRare += daily;
-        if (["Good For You", "Hands To Myself", "Same Old Love", "Kill Em With Kindness", "Me & The Rhythm", "Sober", "Me & My Girls", "Perfect", "Revival", "Nobody", "Camouflage", "Rise", "Cologne", "Outta My Hands (Loco)"].includes(nome)) sumRevival += daily;
-        if (["Love You Like A Love Song", "Who Says", "Hit The Lights", "When The Sun Goes Down", "My Dilemma", "Bang Bang Bang", "Dices", "Middle Of Nowhere", "Whiplash", "That's More Like It", "Outlaw"].includes(nome)) sumWTSGD += daily;
-    });
-
-    if(document.getElementById("countRare")) document.getElementById("countRare").innerText = "+" + sumRare.toLocaleString();
-    if(document.getElementById("countRevival")) document.getElementById("countRevival").innerText = "+" + sumRevival.toLocaleString();
-    if(document.getElementById("countWTSGD")) document.getElementById("countWTSGD").innerText = "+" + sumWTSGD.toLocaleString();
-    // -------------------------
+    let data = musicas.map(m => {
         const total = toNum(m[1]);
         const daily = toNum(m[2]);
-        const dailyOntem = toNum(m[3]);
         const target = getTarget(total, daily);
-        
-        let days = "---";
-        if (daily > 0) {
-            days = Math.ceil((target - total) / daily);
-        }
-        
-        return { name: m[0], total, daily, dailyOntem, cat: m[4], target, days };
+        let days = daily > 0 ? Math.ceil((target - total) / daily) : "---";
+        return { name: m[0], total, daily, cat: m[4], target, days };
     });
 
     if (currentFilter !== 'All') data = data.filter(m => m.cat === currentFilter);
     data = data.filter(m => m.name.toLowerCase().includes(search));
 
     if (sortMode === 'daily') data.sort((a,b) => b.daily - a.daily);
-    else if (sortMode === 'est') {
-        data.sort((a,b) => {
-            if (a.days === "---") return 1;
-            if (b.days === "---") return -1;
-            return a.days - b.days;
-        });
-    }
-    else if (sortMode === 'name') data.sort((a,b) => a.name.localeCompare(b.name));
+    else if (sortMode === 'est') data.sort((a,b) => (a.days === "---" ? 1 : b.days === "---" ? -1 : a.days - b.days));
     else data.sort((a,b) => b.total - a.total);
 
     body.innerHTML = "";
     data.forEach(m => {
         dailyTotal += m.daily;
-        let compHTML = "";
-        if (m.dailyOntem > 0) {
-            const diff = m.daily - m.dailyOntem;
-            const perc = ((diff / m.dailyOntem) * 100).toFixed(1);
-            if (diff > 0) compHTML = `<br><span style="color:#2ecc71; font-size:0.7rem;">▲ ${perc}%</span>`;
-            else if (diff < 0) compHTML = `<br><span style="color:#e74c3c; font-size:0.7rem;">▼ ${Math.abs(perc)}%</span>`;
-        }
-
         body.innerHTML += `<tr>
             <td>${m.name}</td>
-            <td class="daily-col number">${m.daily.toLocaleString()}${compHTML}</td>
-            <td class="number" style="text-align:right">${m.total.toLocaleString()}</td>
-            <td style="text-align:center"><span class="badge-target">${getLabel(m.target)}</span></td>
-            <td class="number" style="text-align:right">${m.days === "---" ? "---" : m.days.toLocaleString() + " dias"}</td>
+            <td style="text-align:right; color:#2ecc71;">${m.daily.toLocaleString()}</td>
+            <td style="text-align:right">${m.total.toLocaleString()}</td>
+            <td style="text-align:center"><span style="background:#2c3e50; color:#ccff90; padding:4px 8px; border-radius:5px; font-size:0.8rem;">${getLabel(m.target)}</span></td>
+            <td style="text-align:right">${m.days === "---" ? "---" : m.days.toLocaleString() + " d"}</td>
         </tr>`;
     });
 
-    const totalEl = document.getElementById("totalDailyStats");
-    if(totalEl) totalEl.innerText = dailyTotal.toLocaleString();
-    
-    const milestoneEl = document.getElementById("nextMilestone");
-    if(milestoneEl) {
+    // CORREÇÃO DOS CARDS DE RESUMO
+    //const dailyElem = document.getElementById("totalDailyStats");
+    //if (dailyElem) dailyElem.innerText = dailyTotal.toLocaleString();
+
+    const nextElem = document.getElementById("nextMilestone");
+    if (nextElem) {
         const next = data.filter(x => x.days !== "---").sort((a,b) => a.days - b.days).slice(0, 3);
-        milestoneEl.innerHTML = next.map(n => 
-            `<div style="font-size:0.85rem; margin-top:5px;"><b>${n.name}</b> em <b>${n.days} dias</b></div>`
-        ).join('');
+        nextElem.innerHTML = next.map(n => `<div>${n.name}: <b>${n.days}d</b></div>`).join('');
     }
 }
 
+// Inicializa
+updateUI();
+
+// Funções do Menu
+function openNav() { document.getElementById("mySidebar").style.left = "0"; }
+function closeNav() { document.getElementById("mySidebar").style.left = "-250px"; }
+
+// Função Calculadora
 function calcularMeta() {
-    const totalAtual = toNum(document.getElementById("calcTotal").value);
-    const metaDesejada = toNum(document.getElementById("calcMeta").value);
-    const mediaDaily = toNum(document.getElementById("calcMedia").value);
-    const boxResultado = document.getElementById("resultadoCalc");
-
-    if(!totalAtual || !metaDesejada || !mediaDaily) {
-        boxResultado.style.display = "block";
-        boxResultado.innerHTML = "<span style='color:red; font-weight:bold;'>⚠️ Preencha todos os campos!</span>";
-        return;
-    }
-
-    if(metaDesejada <= totalAtual) {
-        boxResultado.style.display = "block";
-        boxResultado.innerHTML = "<span style='color:#e67e22; font-weight:bold;'>🎉 Meta alcançada!</span>";
-    } else {
-        const faltam = metaDesejada - totalAtual;
-        const dias = Math.ceil(faltam / mediaDaily);
-        boxResultado.style.display = "block";
-        boxResultado.innerHTML = `
-            <div style="color:var(--ocean); margin-bottom:10px;">Faltam <strong>${faltam.toLocaleString()}</strong> streams.</div>
-            <div style="font-size:1.4rem; color:var(--primary);">🚀 Estimativa: <strong>${dias.toLocaleString()} dias</strong></div>
-        `;
+    const total = toNum(document.getElementById("calcTotal").value);
+    const meta = toNum(document.getElementById("calcMeta").value);
+    const media = toNum(document.getElementById("calcMedia").value);
+    const res = document.getElementById("resultadoCalc");
+    if(res) {
+        res.style.display = "block";
+        if(meta <= total) res.innerHTML = "Meta atingida!";
+        else res.innerHTML = "Faltam " + Math.ceil((meta-total)/media) + " dias.";
     }
 }
-
 function openNav() {
   document.getElementById("mySidebar").style.left = "0";
 }
