@@ -1,109 +1,152 @@
-const musicas = [
-    ["We Don't Talk Anymore (feat. Selena Gomez)", "2.424.410.837", "1.199.257", "1.073.855", "Solo"],
-    ["Calm Down (with Selena Gomez)", "1.799.965.367", "563.347", "582.429", "Solo"],
-    ["Taki Taki (with Selena Gomez, Ozuna & Cardi B)", "1.778.443.720", "314.755", "319.448", "Solo"],
-    ["It Ain’t Me (with Selena Gomez)", "1.663.358.938", "398.015", "351.376", "Solo"],
-    ["Wolves", "1.513.329.217", "207.314", "204.467", "Solo"],
-    ["Lose You To Love Me", "1.429.536.109", "236.902", "246.746", "Solo"],
-    ["Back To You - From 13 Reasons Why", "1.194.756.161", "132.130", "130.528", "Solo"],
-    ["Good For You", "903.798.031", "292.708", "287.605", "Solo"],
-    ["Hands To Myself", "763.837.075", "94.543", "91.468", "Solo"],
-    ["Same Old Love", "761.148.606", "173.383", "169.867", "Solo"],
-    ["Love You Like A Love Song", "1.199.088.818", "650.422", "613.574", "Scene"],
-    ["Who Says", "608.514.727", "139.157", "138.352", "Scene"]
-    // ... (as outras músicas que você tem no GitHub continuam aqui)
-];
+:root { --primary: #6c5ce7; --ocean: #2c3e50; --text: #2d3436; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", sans-serif; background: #f0f2f5; color: var(--text); padding: 20px; scroll-behavior: smooth; }
+.container { max-width: 1100px; margin: auto; }
 
-let sortMode = 'total';
-let currentFilter = 'All';
+/* HEADER */
+header { background: linear-gradient(135deg, #2c3e50, #6c5ce7); color: white; padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
 
-function toNum(val) {
-    if (!val) return 0;
-    return Number(val.toString().replace(/\./g, '').trim()) || 0;
+/* CARD MÚSICA DO DIA (FOCO) */
+.focus-card { background: #fff; border: 2px solid var(--primary); border-radius: 20px; padding: 25px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.1); }
+.focus-info { text-align: left; flex: 1; min-width: 250px; }
+.focus-badge { background: var(--primary); color: white; padding: 6px 15px; border-radius: 50px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+.focus-song { font-size: 1.8rem; font-weight: 800; color: var(--ocean); margin: 10px 0; display: block; }
+.focus-text { margin: 0; font-size: 0.95rem; color: #636e72; }
+
+/* STATS CARDS */
+.summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px; }
+.stat-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
+.stat-card h4 { margin: 0; font-size: 0.75rem; color: #636e72; text-transform: uppercase; }
+.stat-card p { margin: 10px 0 0; font-weight: 800; color: var(--ocean); font-size: 1.1rem; }
+
+/* FILTROS POR CATEGORIA (QUADRADINHOS) */
+.filter-container { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+.filter-btn { flex: 1; min-width: 200px; background: white; border: 2px solid #ddd; border-radius: 15px; padding: 15px; cursor: pointer; transition: 0.3s; text-align: left; position: relative; }
+.filter-btn.active { border-color: var(--primary); background: #f8f7ff; box-shadow: 0 4px 12px rgba(108, 92, 231, 0.1); }
+.filter-btn h5 { margin: 0; font-size: 0.75rem; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; }
+.filter-btn .filter-total { margin-top: 5px; font-weight: 800; color: var(--ocean); font-size: 1rem; display: block; }
+
+/* BUSCA E TABELA */
+.search-box { width: 100%; padding: 18px; border-radius: 15px; border: 2px solid #ddd; font-size: 1rem; margin-bottom: 20px; outline: none; transition: 0.3s; }
+.search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); }
+.card { background: white; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.05); overflow: hidden; }
+.table-container { overflow-x: auto; max-height: 60vh; }
+table { width: 100%; border-collapse: collapse; }
+thead th { background: #2c3e50; color: white; padding: 15px; font-size: 0.75rem; cursor: pointer; position: sticky; top: 0; z-index: 100; text-transform: uppercase; }
+td { padding: 15px; border-bottom: 1px solid #eee; font-weight: 700; font-size: 0.95rem; }
+.number { font-family: 'Courier New', monospace; }
+.daily-col { background: #f0fff4; color: #2f855a; text-align: right; }
+.badge-target { background: var(--ocean); color: #ccff90; padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; }
+
+/* CALCULADORA */
+.inst-section { margin-top: 30px; padding: 30px; background: white; border-radius: 20px; scroll-margin-top: 20px; }
+.calc-group { margin-bottom: 15px; }
+.calc-group label { display: block; font-size: 0.75rem; font-weight: bold; color: #636e72; margin-bottom: 8px; }
+.calc-input { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 10px; font-size: 1.1rem; outline: none; transition: 0.3s; }
+.calc-input:focus { border-color: var(--primary); }
+.btn-calc { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2); }
+.btn-calc:hover { background: #5b4cc4; transform: translateY(-2px); }
+#resultadoCalc { margin-top: 20px; padding: 20px; border-radius: 12px; background: #f8f9ff; display: none; border: 1px solid #eef0ff; }
+
+/* INSTITUCIONAIS */
+.institutional-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 30px; scroll-margin-top: 20px; }
+.institutional-card h1 { color: var(--primary); margin-top: 0; }
+.institutional-card h2 { color: var(--ocean); font-size: 1.2rem; margin-top: 25px; }
+.institutional-card p { line-height: 1.7; color: #636e72; font-size: 1rem; }
+.email-box { background: #f3f0ff; padding: 20px; border-radius: 15px; display: inline-block; margin: 20px 0; border: 1px dashed #6c5ce7; font-weight: bold; color: #6c5ce7; font-size: 1.2rem; }
+
+footer { margin-top: 40px; text-align: center; padding: 40px 0; border-top: 1px solid #eee; }
+footer a { color: var(--primary); text-decoration: none; font-weight: bold; margin: 0 12px; font-size: 0.9rem; transition: 0.2s; }
+footer a:hover { color: var(--ocean); }
+
+@media (max-width: 600px) {
+    .focus-card { text-align: center; justify-content: center; }
+    .focus-info { min-width: 100%; }
+    header h1 { font-size: 1.5rem; }
+    .filter-btn { min-width: 100%; }
+}
+/* --- Estilo do Menu Lateral --- */
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    left: -250px; /* Ele começa escondido à esquerda */
+    background-color: #0f0f0f;
+    border-right: 2px solid #7d2ae8;
+    transition: 0.4s ease;
+    padding-top: 60px;
 }
 
-function getTarget(total, daily) {
-    let step = daily < 5000 ? 500000 : (daily < 50000 ? 2000000 : 5000000);
-    return Math.ceil((total + 1) / step) * step;
+.sidebar a {
+    padding: 15px 25px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    color: #e0e0e0;
+    display: block;
+    transition: 0.3s;
+    border-bottom: 1px solid #222;
 }
 
-function getLabel(t) {
-    if (t >= 1000000000) return (t / 1000000000).toFixed(2) + "B";
-    return (t / 1000000).toFixed(1) + "M";
+.sidebar a:hover {
+    background-color: #7d2ae8;
+    color: white;
 }
 
-function toggleFilter(cat) {
-    currentFilter = currentFilter === cat ? 'All' : cat;
-    const btnSolo = document.getElementById("btnSolo");
-    const btnScene = document.getElementById("btnScene");
-    if(btnSolo) btnSolo.classList.toggle("active", currentFilter === 'Solo');
-    if(btnScene) btnScene.classList.toggle("active", currentFilter === 'Scene');
-    updateUI();
+/* Botão MENU que fica flutuando na tela */
+.open-btn {
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #7d2ae8;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1500;
+    border-radius: 5px;
+    font-weight: bold;
 }
 
-function setSort(m) { sortMode = m; updateUI(); }
-
-function updateUI() {
-    const search = document.getElementById("searchInput") ? document.getElementById("searchInput").value.toLowerCase() : "";
-    const body = document.getElementById("tableBody");
-    if (!body) return;
-
-    let dailyTotal = 0;
-
-    let data = musicas.map(m => {
-        const total = toNum(m[1]);
-        const daily = toNum(m[2]);
-        const target = getTarget(total, daily);
-        let days = daily > 0 ? Math.ceil((target - total) / daily) : "---";
-        return { name: m[0], total, daily, cat: m[4], target, days };
-    });
-
-    if (currentFilter !== 'All') data = data.filter(m => m.cat === currentFilter);
-    data = data.filter(m => m.name.toLowerCase().includes(search));
-
-    if (sortMode === 'daily') data.sort((a,b) => b.daily - a.daily);
-    else if (sortMode === 'est') data.sort((a,b) => (a.days === "---" ? 1 : b.days === "---" ? -1 : a.days - b.days));
-    else data.sort((a,b) => b.total - a.total);
-
-    body.innerHTML = "";
-    data.forEach(m => {
-        dailyTotal += m.daily;
-        body.innerHTML += `<tr>
-            <td>${m.name}</td>
-            <td style="text-align:right; color:#2ecc71;">${m.daily.toLocaleString()}</td>
-            <td style="text-align:right">${m.total.toLocaleString()}</td>
-            <td style="text-align:center"><span style="background:#2c3e50; color:#ccff90; padding:4px 8px; border-radius:5px; font-size:0.8rem;">${getLabel(m.target)}</span></td>
-            <td style="text-align:right">${m.days === "---" ? "---" : m.days.toLocaleString() + " d"}</td>
-        </tr>`;
-    });
-
-    // CORREÇÃO DOS CARDS DE RESUMO
-    //const dailyElem = document.getElementById("totalDailyStats");
-    //if (dailyElem) dailyElem.innerText = dailyTotal.toLocaleString();
-
-    const nextElem = document.getElementById("nextMilestone");
-    if (nextElem) {
-        const next = data.filter(x => x.days !== "---").sort((a,b) => a.days - b.days).slice(0, 3);
-        nextElem.innerHTML = next.map(n => `<div>${n.name}: <b>${n.days}d</b></div>`).join('');
-    }
+.album-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+    gap: 15px; 
 }
 
-// Inicializa
-updateUI();
+.album-card { 
+    background: white; 
+    border-radius: 15px; 
+    padding: 15px; 
+    display: flex; 
+    align-items: center; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+    border-left: 5px solid #6c5ce7; 
+}
 
-// Funções do Menu
-function openNav() { document.getElementById("mySidebar").style.left = "0"; }
-function closeNav() { document.getElementById("mySidebar").style.left = "-250px"; }
+.rank-num { 
+    font-size: 1.5rem; 
+    font-weight: 800; 
+    color: #6c5ce7; 
+    margin-right: 15px; 
+}
 
-// Função Calculadora
-function calcularMeta() {
-    const total = toNum(document.getElementById("calcTotal").value);
-    const meta = toNum(document.getElementById("calcMeta").value);
-    const media = toNum(document.getElementById("calcMedia").value);
-    const res = document.getElementById("resultadoCalc");
-    if(res) {
-        res.style.display = "block";
-        if(meta <= total) res.innerHTML = "Meta atingida!";
-        else res.innerHTML = "Faltam " + Math.ceil((meta-total)/media) + " dias.";
-    }
+.a-info p { margin: 0; line-height: 1.4; }
+.a-name { font-weight: bold; font-size: 0.95rem; color: #2c3e50; }
+.a-total { font-size: 0.85rem; color: #636e72; }
+.a-daily { font-size: 0.85rem; color: #2ecc71; font-weight: bold; }
+
+/* Isso cria o espaço que falta entre os álbuns e os botões de filtro */
+.album-dashboard {
+    margin-bottom: 40px; /* Aumenta a distância para 40px */
+}
+
+/* Opcional: Melhora o título da seção de álbuns */
+.album-dashboard h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
 }
