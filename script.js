@@ -275,31 +275,81 @@ function updateUI() {
 }
 
 // Inicializa
-updateUI();
+function updateUI() {
+    const searchInput = document.getElementById("searchInput");
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
+    const body = document.getElementById("tableBody");
+    if(!body) return;
 
-// Funções do Menu
-function openNav() { document.getElementById("mySidebar").style.left = "0"; }
-function closeNav() { document.getElementById("mySidebar").style.left = "-250px"; }
+    let dailyTotal = 0;
 
-// Função Calculadora
-function calcularMeta() {
-    const total = toNum(document.getElementById("calcTotal").value);
-    const meta = toNum(document.getElementById("calcMeta").value);
-    const media = toNum(document.getElementById("calcMedia").value);
-    const res = document.getElementById("resultadoCalc");
-    if(res) {
-        res.style.display = "block";
-        if(meta <= total) res.innerHTML = "Meta atingida!";
-        else res.innerHTML = "Faltam " + Math.ceil((meta-total)/media) + " dias.";
+    // --- CÁLCULO DOS ÁLBUNS ---
+    let sumRare = 0, totalRare = 0;
+    let sumRevival = 0, totalRevival = 0;
+    let sumWTSGD = 0, totalWTSGD = 0;
+
+    musicas.forEach(m => {
+        const nome = m[0];
+        const total = toNum(m[1]);
+        const daily = toNum(m[2]);
+
+        // Rare
+        if (["Lose You To Love Me", "Look At Her Now", "Rare", "Boyfriend", "Souvenir", "Ring", "Vulnerable", "Dance Again", "Crowded Room (feat. 6LACK)", "Let Me Get Me", "Cut You Off", "Kinda Crazy", "Fun", "A Sweeter Place (feat. Kid Cudi)", "She", "People You Know"].includes(nome)) {
+            sumRare += daily; totalRare += total;
+        }
+        // Revival
+        if (["Good For You", "Hands To Myself", "Same Old Love", "Kill Em With Kindness", "Me & The Rhythm", "Sober", "Me & My Girls", "Perfect", "Revival", "Nobody", "Camouflage", "Rise", "Cologne", "Outta My Hands (Loco)"].includes(nome)) {
+            sumRevival += daily; totalRevival += total;
+        }
+        // When The Sun Goes Down
+        if (["Love You Like A Love Song", "Who Says", "Hit The Lights", "When The Sun Goes Down", "My Dilemma", "Bang Bang Bang", "Dices", "Middle Of Nowhere", "Whiplash", "That's More Like It", "Outlaw"].includes(nome)) {
+            sumWTSGD += daily; totalWTSGD += total;
+        }
+    });
+
+    // Injetar valores nos cards do topo
+    if(document.getElementById("countRare")) {
+        document.getElementById("countRare").innerText = "+" + sumRare.toLocaleString();
+        document.getElementById("totalRare").innerText = totalRare.toLocaleString();
     }
-}
-function openNav() {
-  document.getElementById("mySidebar").style.left = "0";
-}
+    if(document.getElementById("countRevival")) {
+        document.getElementById("countRevival").innerText = "+" + sumRevival.toLocaleString();
+        document.getElementById("totalRevival").innerText = totalRevival.toLocaleString();
+    }
+    if(document.getElementById("countWTSGD")) {
+        document.getElementById("countWTSGD").innerText = "+" + sumWTSGD.toLocaleString();
+        document.getElementById("totalWTSGD").innerText = totalWTSGD.toLocaleString();
+    }
 
-function closeNav() {
-  document.getElementById("mySidebar").style.left = "-250px";
-}
+    // --- RESTANTE DA TABELA ---
+    let data = musicas.map(m => {
+        const total = toNum(m[1]);
+        const daily = toNum(m[2]);
+        const dailyOntem = toNum(m[3]);
+        const target = getTarget(total, daily);
+        let days = (daily > 0) ? Math.ceil((target - total) / daily) : "---";
+        return { name: m[0], total, daily, dailyOntem, cat: m[4], target, days };
+    });
 
-// INICIALIZAÇÃO
-updateUI();
+    if (currentFilter !== 'All') data = data.filter(m => m.cat === currentFilter);
+    data = data.filter(m => m.name.toLowerCase().includes(search));
+
+    if (sortMode === 'daily') data.sort((a,b) => b.daily - a.daily);
+    else if (sortMode === 'est') data.sort((a,b) => (a.days === "---" ? 1 : b.days === "---" ? -1 : a.days - b.days));
+    else if (sortMode === 'name') data.sort((a,b) => a.name.localeCompare(b.name));
+    else data.sort((a,b) => b.total - a.total);
+
+    body.innerHTML = "";
+    data.forEach(m => {
+        dailyTotal += m.daily;
+        let compHTML = "";
+        if (m.dailyOntem > 0) {
+            const diff = m.daily - m.dailyOntem;
+            const perc = ((diff / m.dailyOntem) * 100).toFixed(1);
+            compHTML = diff > 0 ? `<br><span style="color:#2ecc71; font-size:0.7rem;">▲ ${perc}%</span>` : `<br><span style="color:#e74c3c; font-size:0.7rem;">▼ ${Math.abs(perc)}%</span>`;
+        }
+        body.innerHTML += `<tr><td>${m.name}</td><td class="daily-col number">${m.daily.toLocaleString()}${compHTML}</td><td class="number" style="text-align:right">${m.total.toLocaleString()}</td><td style="text-align:center"><span class="badge-target">${getLabel(m.target)}</span></td><td class="number" style="text-align:right">${m.days === "---" ? "---" : m.days.toLocaleString() + " dias"}</td></tr>`;
+    });
+
+    if(document.getElementById("totalDailyStats")) document.getElementById("totalDailyStats").innerText = dailyTotal.toLocaleString();
+}
