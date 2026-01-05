@@ -47,7 +47,7 @@ const musicas = [
 ["How Does It Feel To Be Forgotten", "72.884.336", "48.154", "49.403", "Solo"],
 ["Vulnerable", "70.581.254", "8.655", "8.311", "Solo"],
 ["Dance Again", "68.809.714", "6.277", "5.856", "Solo"],
-["Love Will Remember", "68.53.232", "5.172", "5.308", "Solo"],
+["Love Will Remember", "68.530.232", "5.172", "5.308", "Solo"],
 ["Crowded Room (feat. 6LACK)", "65.646.956", "5.800", "5.922", "Solo"],
 ["Sunset Blvd", "64.792.693", "51.803", "48.695", "Solo"],
 ["Perfect", "63.403.033", "6.130", "6.855", "Solo"],
@@ -155,7 +155,6 @@ const musicas = [
 ["I Want You To Know (Lophiile)", "1.889.189", "169", "145", "Solo"],
 ["Trust in Me", "1.840.920", "76", "60", "Solo"],
 
-// --- SELENA GOMEZ & THE SCENE ---
 ["Love You Like A Love Song", "1.199.088.818", "650.422", "613.574", "Scene"],
 ["Who Says", "608.514.727", "139.157", "138.352", "Scene"],
 ["Naturally", "178.086.777", "47.517", "47.559", "Scene"],
@@ -204,7 +203,6 @@ const musicas = [
 let sortMode = 'total';
 let currentFilter = 'All';
 
-// FUNÇÃO PARA LIMPAR PONTOS E CONVERTER EM NÚMERO REAL
 function toNum(val) {
     if (!val) return 0;
     if (typeof val === 'number') return val;
@@ -234,56 +232,32 @@ function toggleFilter(cat) {
         currentFilter = cat;
     }
 
-    // Atualiza os botões antigos (se você ainda os tiver no site)
-    if(document.getElementById("btnSolo")) document.getElementById("btnSolo").classList.toggle("active", currentFilter === 'Solo');
-    if(document.getElementById("btnScene")) document.getElementById("btnScene").classList.toggle("active", currentFilter === 'Scene');
-
-    // Efeito Visual nos novos Cards de Cima
     const cardSolo = document.getElementById("cardSolo");
     const cardScene = document.getElementById("cardScene");
 
     if(cardSolo && cardScene) {
         cardSolo.style.opacity = (currentFilter === 'Solo' || currentFilter === 'All') ? "1" : "0.5";
         cardScene.style.opacity = (currentFilter === 'Scene' || currentFilter === 'All') ? "1" : "0.5";
-        
         cardSolo.style.transform = (currentFilter === 'Solo') ? "scale(1.05)" : "scale(1)";
         cardScene.style.transform = (currentFilter === 'Scene') ? "scale(1.05)" : "scale(1)";
     }
-
     updateUI();
 }
 
-    // Atualiza os botões antigos (se você ainda os tiver no site)
-    if(document.getElementById("btnSolo")) document.getElementById("btnSolo").classList.toggle("active", currentFilter === 'Solo');
-    if(document.getElementById("btnScene")) document.getElementById("btnScene").classList.toggle("active", currentFilter === 'Scene');
-
-    // Efeito Visual nos novos Cards de Cima
-    const cardSolo = document.getElementById("cardSolo");
-    const cardScene = document.getElementById("cardScene");
-
-    if(cardSolo && cardScene) {
-        cardSolo.style.opacity = (currentFilter === 'Solo' || currentFilter === 'All') ? "1" : "0.5";
-        cardScene.style.opacity = (currentFilter === 'Scene' || currentFilter === 'All') ? "1" : "0.5";
-        
-        cardSolo.style.transform = (currentFilter === 'Solo') ? "scale(1.05)" : "scale(1)";
-        cardScene.style.transform = (currentFilter === 'Scene') ? "scale(1.05)" : "scale(1)";
-    }
-
-    updateUI();
-}
 function updateUI() {
-    const search = document.getElementById("searchInput").value.toLowerCase();
+    const searchInput = document.getElementById("searchInput");
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
     const body = document.getElementById("tableBody");
-    let dailyTotal = 0; // RESETADO A CADA CICLO PARA EVITAR NÚMEROS ENORMES
+    if(!body) return;
 
-    // PROCESSAMENTO SEGURO DOS DADOS
+    let dailyTotal = 0;
+
     let data = musicas.map(m => {
         const total = toNum(m[1]);
         const daily = toNum(m[2]);
         const dailyOntem = toNum(m[3]);
         const target = getTarget(total, daily);
         
-        // Proteção contra divisão por zero para evitar o NaN na estimativa
         let days = "---";
         if (daily > 0) {
             days = Math.ceil((target - total) / daily);
@@ -295,7 +269,6 @@ function updateUI() {
     if (currentFilter !== 'All') data = data.filter(m => m.cat === currentFilter);
     data = data.filter(m => m.name.toLowerCase().includes(search));
 
-    // ORDENAÇÃO
     if (sortMode === 'daily') data.sort((a,b) => b.daily - a.daily);
     else if (sortMode === 'est') {
         data.sort((a,b) => {
@@ -327,13 +300,16 @@ function updateUI() {
         </tr>`;
     });
 
-    // ATUALIZA OS CARDS DE RESUMO
-    document.getElementById("totalDailyStats").innerText = dailyTotal.toLocaleString();
+    const totalEl = document.getElementById("totalDailyStats");
+    if(totalEl) totalEl.innerText = dailyTotal.toLocaleString();
     
-    const next = data.filter(x => x.days !== "---").sort((a,b) => a.days - b.days).slice(0, 3);
-    document.getElementById("nextMilestone").innerHTML = next.map(n => 
-        `<div style="font-size:0.85rem; margin-top:5px;"><b>${n.name}</b> em <b>${n.days} dias</b></div>`
-    ).join('');
+    const milestoneEl = document.getElementById("nextMilestone");
+    if(milestoneEl) {
+        const next = data.filter(x => x.days !== "---").sort((a,b) => a.days - b.days).slice(0, 3);
+        milestoneEl.innerHTML = next.map(n => 
+            `<div style="font-size:0.85rem; margin-top:5px;"><b>${n.name}</b> em <b>${n.days} dias</b></div>`
+        ).join('');
+    }
 }
 
 function calcularMeta() {
@@ -361,7 +337,7 @@ function calcularMeta() {
         `;
     }
 }
-updateUI();
+
 function openNav() {
   document.getElementById("mySidebar").style.left = "0";
 }
@@ -369,3 +345,6 @@ function openNav() {
 function closeNav() {
   document.getElementById("mySidebar").style.left = "-250px";
 }
+
+// INICIALIZAÇÃO
+updateUI();
