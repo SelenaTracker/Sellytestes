@@ -252,6 +252,25 @@ function toggleFilter(cat) {
 
     updateUI();
 }
+
+    // Atualiza os botões antigos (se você ainda os tiver no site)
+    if(document.getElementById("btnSolo")) document.getElementById("btnSolo").classList.toggle("active", currentFilter === 'Solo');
+    if(document.getElementById("btnScene")) document.getElementById("btnScene").classList.toggle("active", currentFilter === 'Scene');
+
+    // Efeito Visual nos novos Cards de Cima
+    const cardSolo = document.getElementById("cardSolo");
+    const cardScene = document.getElementById("cardScene");
+
+    if(cardSolo && cardScene) {
+        cardSolo.style.opacity = (currentFilter === 'Solo' || currentFilter === 'All') ? "1" : "0.5";
+        cardScene.style.opacity = (currentFilter === 'Scene' || currentFilter === 'All') ? "1" : "0.5";
+        
+        cardSolo.style.transform = (currentFilter === 'Solo') ? "scale(1.05)" : "scale(1)";
+        cardScene.style.transform = (currentFilter === 'Scene') ? "scale(1.05)" : "scale(1)";
+    }
+
+    updateUI();
+}
 function updateUI() {
     const search = document.getElementById("searchInput").value.toLowerCase();
     const body = document.getElementById("tableBody");
