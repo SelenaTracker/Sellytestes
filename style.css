@@ -109,3 +109,44 @@ footer a:hover { color: var(--ocean); }
     border-radius: 5px;
     font-weight: bold;
 }
+
+.album-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+    gap: 15px; 
+}
+
+.album-card { 
+    background: white; 
+    border-radius: 15px; 
+    padding: 15px; 
+    display: flex; 
+    align-items: center; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+    border-left: 5px solid #6c5ce7; 
+}
+
+.rank-num { 
+    font-size: 1.5rem; 
+    font-weight: 800; 
+    color: #6c5ce7; 
+    margin-right: 15px; 
+}
+
+.a-info p { margin: 0; line-height: 1.4; }
+.a-name { font-weight: bold; font-size: 0.95rem; color: #2c3e50; }
+.a-total { font-size: 0.85rem; color: #636e72; }
+.a-daily { font-size: 0.85rem; color: #2ecc71; font-weight: bold; }
+
+/* Isso cria o espaço que falta entre os álbuns e os botões de filtro */
+.album-dashboard {
+    margin-bottom: 40px; /* Aumenta a distância para 40px */
+}
+
+/* Opcional: Melhora o título da seção de álbuns */
+.album-dashboard h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
